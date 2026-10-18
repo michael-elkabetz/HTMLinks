@@ -1,0 +1,35 @@
+name: Check
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: htmlinks
+          POSTGRES_PASSWORD: htmlinks-ci
+          POSTGRES_DB: htmlinks
+        ports:
+          - 5439:5432
+        options: >-
+          --health-cmd "pg_isready -U htmlinks -d htmlinks"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgres://htmlinks:htmlinks-ci@localhost:5439/htmlinks
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+          cache: npm
+      - run: npm ci
+      - run: npm run init
+      - run: npm run release:check
+      - run: npm run check:skill-install
+      - run: npm run check:integration
+      - run: docker build -t htmlinks:check .

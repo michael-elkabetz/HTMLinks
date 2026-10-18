@@ -1,0 +1,179 @@
+<svg class="archify-diagram" viewBox="0 0 660 674" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase" data-reader-fit="intrinsic-height" data-reader-min-text="7.5" data-reader-primary-text="14">
+        <title id="archify-diagram-title">An HTML publishing service</title>
+        <desc id="archify-diagram-description">Publishing: author to API, PostgreSQL, and private files. Reading: browser to isolated viewer, with access checks and private HTML delivery.</desc>
+        <!-- Definitions -->
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
+          </marker>
+          <marker id="arrowhead-emphasis" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-emphasis" />
+          </marker>
+          <marker id="arrowhead-security" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-security" />
+          </marker>
+          <marker id="arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-dashed" />
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" class="c-grid" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <!-- Background Grid -->
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- Boundaries (behind everything) -->
+
+
+        <!-- Connection paths (before components for correct z-order) -->
+        <g data-graph-role="automatic-crossover" style="--step:0">
+          <path data-graph-role="automatic-crossover-underlay" d="M 230 79.95 L 440 79.95" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="author" data-edge-to="publisher" data-edge-label="Upload HTML" data-edge-key="0" data-edge-id="upload" data-composition-points="230,79.95;440,79.95" data-composition-crossover="halo" data-composition-independent="true" d="M 230 79.95 L 440 79.95" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:1">
+          <path data-graph-role="automatic-crossover-underlay" d="M 440 95 L 343 95 Q 335 95 335 103 L 335 313 Q 335 321 327 321 L 230 321" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="publisher" data-edge-to="metadata" data-edge-label="Save metadata" data-edge-key="1" data-edge-id="metadata-write" data-composition-points="440,95;335,95;335,321;230,321" data-composition-crossover="halo" data-composition-independent="true" d="M 440 95 L 343 95 Q 335 95 335 103 L 335 313 Q 335 321 327 321 L 230 321" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:2">
+          <path data-graph-role="automatic-crossover-underlay" d="M 530 126 L 530 290" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="publisher" data-edge-to="objects" data-edge-label="Store revision" data-edge-key="2" data-edge-id="file-write" data-composition-points="530,126;530,290" data-composition-crossover="halo" data-composition-independent="true" d="M 530 126 L 530 290" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:3">
+          <path data-graph-role="automatic-crossover-underlay" d="M 230 576.05 L 440 576.05" fill="none" stroke="var(--mask)" stroke-width="5.8" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="reader" data-edge-to="viewer" data-edge-label="Open link" data-edge-key="3" data-edge-id="reader-open" data-composition-points="230,576.05;440,576.05" data-composition-crossover="halo" data-composition-independent="true" d="M 230 576.05 L 440 576.05" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:4">
+          <path data-graph-role="automatic-crossover-underlay" d="M 530 530 L 530 366" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="viewer" data-edge-to="objects" data-edge-label="Read allowed HTML" data-edge-key="4" data-edge-id="file-read" data-composition-points="530,530;530,366" data-composition-crossover="halo" data-composition-independent="true" d="M 530 530 L 530 366" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        </g>
+        <g data-graph-role="automatic-crossover" style="--step:5">
+          <path data-graph-role="automatic-crossover-underlay" d="M 440 561 L 424 561 Q 416 561 416 553 L 416 343 Q 416 335 408 335 L 230 335" fill="none" stroke="var(--mask)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"/>
+          <path data-edge-from="viewer" data-edge-to="metadata" data-edge-label="Check access" data-edge-key="5" data-edge-id="access-check" data-composition-points="440,561;416,561;416,335;230,335" data-composition-crossover="halo" data-composition-independent="true" d="M 440 561 L 424 561 Q 416 561 416 553 L 416 343 Q 416 335 408 335 L 230 335" class="a-security" stroke-width="1.5" marker-end="url(#arrowhead-security)"/>
+        </g>
+
+        <!-- Components -->
+        <g id="node-author" data-node-id="author" data-node-label="Author’s agent" tabindex="0" role="button" aria-label="Focus Author’s agent, Self-contained HTML, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="Self-contained HTML" data-node-context="Architecture component">
+          <title>Author’s agent · Self-contained HTML · Architecture component</title>
+          <rect x="50" y="50" width="180" height="76" rx="6" class="c-mask"/>
+          <rect x="50" y="50" width="180" height="76" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(56 56) scale(0.6875)">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="140" y="86" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Author’s agent</text>
+        <text data-detail="context" x="140" y="102" class="t-muted" font-size="9" text-anchor="middle">Self-contained HTML</text>
+        </g>
+
+        <g id="node-publisher" data-node-id="publisher" data-node-label="Publishing API" tabindex="0" role="button" aria-label="Focus Publishing API, Upload + management, Architecture component" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Upload + management" data-node-context="Architecture component">
+          <title>Publishing API · Upload + management · Architecture component</title>
+          <rect x="440" y="50" width="180" height="76" rx="6" class="c-mask"/>
+          <rect x="440" y="50" width="180" height="76" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(446 56) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="530" y="86" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Publishing API</text>
+        <text data-detail="context" x="530" y="102" class="t-muted" font-size="9" text-anchor="middle">Upload + management</text>
+        </g>
+
+        <g id="node-metadata" data-node-id="metadata" data-node-label="PostgreSQL" tabindex="0" role="button" aria-label="Focus PostgreSQL, Access + revisions, Architecture component" aria-pressed="false" data-node-kind="database" data-node-sublabel="Access + revisions" data-node-context="Architecture component">
+          <title>PostgreSQL · Access + revisions · Architecture component</title>
+          <rect x="50" y="290" width="180" height="76" rx="6" class="c-mask"/>
+          <rect x="50" y="290" width="180" height="76" rx="6" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(56 296) scale(0.6875)">
+            <ellipse cx="8" cy="4" rx="5" ry="2"/>
+            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="140" y="326" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">PostgreSQL</text>
+        <text data-detail="context" x="140" y="342" class="t-muted" font-size="9" text-anchor="middle">Access + revisions</text>
+        </g>
+
+        <g id="node-objects" data-node-id="objects" data-node-label="Private files" tabindex="0" role="button" aria-label="Focus Private files, Immutable HTML bytes, Architecture component" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="Immutable HTML bytes" data-node-context="Architecture component">
+          <title>Private files · Immutable HTML bytes · Architecture component</title>
+          <rect x="440" y="290" width="180" height="76" rx="6" class="c-mask"/>
+          <rect x="440" y="290" width="180" height="76" rx="6" class="c-cloud" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(446 296) scale(0.6875)">
+            <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="530" y="326" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Private files</text>
+        <text data-detail="context" x="530" y="342" class="t-muted" font-size="9" text-anchor="middle">Immutable HTML bytes</text>
+        </g>
+
+        <g id="node-reader" data-node-id="reader" data-node-label="Reader’s browser" tabindex="0" role="button" aria-label="Focus Reader’s browser, The sharing URL, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="The sharing URL" data-node-context="Architecture component">
+          <title>Reader’s browser · The sharing URL · Architecture component</title>
+          <rect x="50" y="530" width="180" height="76" rx="6" class="c-mask"/>
+          <rect x="50" y="530" width="180" height="76" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(56 536) scale(0.6875)">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="140" y="566" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Reader’s browser</text>
+        <text data-detail="context" x="140" y="582" class="t-muted" font-size="9" text-anchor="middle">The sharing URL</text>
+        </g>
+
+        <g id="node-viewer" data-node-id="viewer" data-node-label="Isolated viewer" tabindex="0" role="button" aria-label="Focus Isolated viewer, Access-checked delivery, Architecture component" aria-pressed="false" data-node-kind="security" data-node-sublabel="Access-checked delivery" data-node-context="Architecture component">
+          <title>Isolated viewer · Access-checked delivery · Architecture component</title>
+          <rect x="440" y="530" width="180" height="76" rx="6" class="c-mask"/>
+          <rect x="440" y="530" width="180" height="76" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(446 536) scale(0.6875)">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
+            <path d="m5.8 8 1.5 1.5 3-3"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="530" y="566" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Isolated viewer</text>
+        <text data-detail="context" x="530" y="582" class="t-muted" font-size="9" text-anchor="middle">Access-checked delivery</text>
+        </g>
+
+        <!-- Connection labels -->
+        <g data-detail="context" data-edge-from="author" data-edge-to="publisher" data-edge-label="Upload HTML" data-edge-key="0" data-edge-id="upload">
+          <rect x="303.6" y="59.95" width="62.8" height="14" rx="3" class="c-mask"/>
+          <text x="335" y="69.95" class="t-edge-emphasis" font-size="8" text-anchor="middle">Upload HTML</text>
+        </g>
+        <g data-detail="context" data-edge-from="publisher" data-edge-to="metadata" data-edge-label="Save metadata" data-edge-key="1" data-edge-id="metadata-write">
+          <rect x="298.8" y="188" width="72.4" height="14" rx="3" class="c-mask"/>
+          <text x="335" y="198" class="t-edge-default" font-size="8" text-anchor="middle">Save metadata</text>
+        </g>
+        <g data-detail="context" data-edge-from="publisher" data-edge-to="objects" data-edge-label="Store revision" data-edge-key="2" data-edge-id="file-write">
+          <rect x="446.79999999999995" y="201" width="77.2" height="14" rx="3" class="c-mask"/>
+          <text x="485.4" y="211" class="t-edge-default" font-size="8" text-anchor="middle">Store revision</text>
+        </g>
+        <g data-detail="context" data-edge-from="reader" data-edge-to="viewer" data-edge-label="Open link" data-edge-key="3" data-edge-id="reader-open">
+          <rect x="308.4" y="556.05" width="53.199999999999996" height="14" rx="3" class="c-mask"/>
+          <text x="335" y="566.05" class="t-edge-emphasis" font-size="8" text-anchor="middle">Open link</text>
+        </g>
+        <g data-detail="context" data-edge-from="viewer" data-edge-to="objects" data-edge-label="Read allowed HTML" data-edge-key="4" data-edge-id="file-read">
+          <rect x="484.2" y="510" width="91.6" height="14" rx="3" class="c-mask"/>
+          <text x="530" y="520" class="t-edge-default" font-size="8" text-anchor="middle">Read allowed HTML</text>
+        </g>
+        <g data-detail="context" data-edge-from="viewer" data-edge-to="metadata" data-edge-label="Check access" data-edge-key="5" data-edge-id="access-check">
+          <rect x="382.2" y="428" width="67.6" height="14" rx="3" class="c-mask"/>
+          <text x="416" y="438" class="t-edge-security" font-size="8" text-anchor="middle">Check access</text>
+        </g>
+
+        <!-- Boundary labels (foreground masks keep routes out of titles) -->
+
+
+        <!-- Legend -->
+        <g data-legend="" data-legend-bridge="">
+          <text x="40" y="638" class="t-primary" font-size="12" font-weight="650">Legend</text>
+          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="Backend" data-legend-x="40" data-legend-baseline="658" data-legend-width="78">
+            <rect x="40" y="649" width="16" height="10" rx="2.5" class="c-backend" stroke-width="1"/>
+            <text x="62" y="658" class="t-muted" font-size="10" font-weight="500">Backend</text>
+          </g>
+          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="Database" data-legend-x="140" data-legend-baseline="658" data-legend-width="83">
+            <rect x="140" y="649" width="16" height="10" rx="2.5" class="c-database" stroke-width="1"/>
+            <text x="162" y="658" class="t-muted" font-size="10" font-weight="500">Database</text>
+          </g>
+          <g data-legend-semantic-kind="cloud" data-legend-kind="cloud" data-legend-label="Cloud" data-legend-x="245" data-legend-baseline="658" data-legend-width="68">
+            <rect x="245" y="649" width="16" height="10" rx="2.5" class="c-cloud" stroke-width="1"/>
+            <text x="267" y="658" class="t-muted" font-size="10" font-weight="500">Cloud</text>
+          </g>
+          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="Security" data-legend-x="335" data-legend-baseline="658" data-legend-width="83">
+            <rect x="335" y="649" width="16" height="10" rx="2.5" class="c-security" stroke-width="1"/>
+            <text x="357" y="658" class="t-muted" font-size="10" font-weight="500">Security</text>
+          </g>
+          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="External" data-legend-x="440" data-legend-baseline="658" data-legend-width="83">
+            <rect x="440" y="649" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
+            <text x="462" y="658" class="t-muted" font-size="10" font-weight="500">External</text>
+          </g>
+        </g>
+      </svg>

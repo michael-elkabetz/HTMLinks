@@ -1,0 +1,32 @@
+# Keep the existing service identity during upgrades.
+name: hstore-cloud
+x-cloud: &cloud
+  image: htmlinks:local
+  build: .
+  init: true
+  restart: unless-stopped
+  env_file: .env
+  depends_on:
+    migrate:
+      condition: service_completed_successfully
+services:
+  migrate:
+    <<: *cloud
+    restart: "no"
+    command: ["node", "scripts/migrate.mjs"]
+    depends_on: []
+    healthcheck:
+      disable: true
+  web:
+    <<: *cloud
+    environment:
+      STORAGE_DRIVER: supabase
+    ports:
+      - "127.0.0.1:${HTMLINKS_PORT:-${HSTORE_PORT:-3000}}:3000"
+  maintenance:
+    <<: *cloud
+    environment:
+      STORAGE_DRIVER: supabase
+    command: ["node", "scripts/maintenance.mjs", "--loop"]
+    healthcheck:
+      disable: true

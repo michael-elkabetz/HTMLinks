@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HTMLinks · Private by choice</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 64px;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: Arial, Helvetica, sans-serif;
+        overflow-x: clip;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1,
+      h2 {
+        font-weight: 500;
+        letter-spacing: -0.065em;
+        line-height: 0.98;
+        text-wrap: balance;
+      }
+      h1 {
+        font-size: clamp(38px, 6.6vw, 88px);
+      }
+      h2 {
+        font-size: clamp(34px, 5.3vw, 70px);
+      }
+      h3 {
+        font-size: 22px;
+        font-weight: 500;
+        letter-spacing: -0.03em;
+      }
+      p {
+        font-size: clamp(16px, 1.6vw, 20px);
+        line-height: 1.65;
+        max-width: 490px;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button,
+      a,
+      input {
+        touch-action: manipulation;
+      }
+      button,
+      a {
+        color: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 5px;
+      }
+      a {
+        text-underline-offset: 5px;
+      }
+      .masthead {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 24px clamp(24px, 5vw, 72px);
+        z-index: 5;
+        font-size: 13px;
+      }
+      .masthead a {
+        text-decoration: none;
+      }
+      .reading-progress {
+        position: fixed;
+        z-index: 20;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--accent);
+        transform: scaleX(0);
+        transform-origin: left;
+      }
+      .chapter {
+        position: relative;
+        min-height: 100svh;
+        padding: 100px clamp(24px, 6vw, 88px) 80px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        align-items: center;
+        gap: clamp(30px, 6vw, 100px);
+        isolation: isolate;
+        container-type: inline-size;
+      }
+      .copy {
+        display: grid;
+        gap: 25px;
+        max-width: 570px;
+      }
+      .note {
+        font-size: 13px;
+        line-height: 1.6;
+        opacity: 0.75;
+      }
+      .scroll-note {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+      }
+      .scroll-note span {
+        display: block;
+        width: 23px;
+        height: 36px;
+        border: 2px solid currentColor;
+        border-radius: 16px;
+        position: relative;
+      }
+      .scroll-note span:after {
+        content: "";
+        position: absolute;
+        top: 6px;
+        left: 8px;
+        width: 3px;
+        height: 7px;
+        background: currentColor;
+        border-radius: 2px;
+      }
+      .stage {
+        position: relative;
+        min-width: 0;
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        perspective: 1000px;
+      }
+      .section-nav {
+        display: flex;
+        gap: 22px;
+        flex-wrap: wrap;
+        font-size: 14px;
+        margin-top: 12px;
+      }
+      .section-nav a {
+        opacity: 0.8;
+      }
+      .pill-button {
+        border: 0;
+        background: var(--accent);
+        color: var(--bg);
+        padding: 14px 20px;
+        border-radius: 99px;
+        min-height: 46px;
+        transition: transform 0.2s;
+      }
+      .pill-button:hover {
+        transform: translateY(-3px);
+      }
+      footer {
+        padding: 30px clamp(24px, 6vw, 88px);
+        font-size: 13px;
+        line-height: 1.6;
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+      }
+      .reveal {
+        transform-origin: center;
+      }
+      .chapter .chapter-link {
+        position: absolute;
+        bottom: 28px;
+        left: clamp(24px, 6vw, 88px);
+        font-size: 13px;
+      }
+      .chapter code {
+        font-family: ui-monospace, monospace;
+        font-size: 0.85em;
+      }
+      pre {
+        font-size: 13px;
+        line-height: 1.9;
+        overflow: auto;
+        margin: 0;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      .motion-art {
+        transform: translateY(calc(var(--travel, 0) * -30px))
+          rotate(calc(var(--travel, 0) * -3deg));
+      }
+      .sample-tag {
+        font-size: 13px;
+        opacity: 0.7;
+      }
+      @supports (animation-timeline: scroll()) {
+        .reading-progress {
+          animation: read-progress linear both;
+          animation-timeline: scroll(root block);
+        }
+      }
+      @supports (animation-timeline: view()) {
+        .reveal {
+          animation: reveal-panel linear both;
+          animation-timeline: view();
+          animation-range: entry 0% entry 90%;
+        }
+      }
+      @keyframes reveal-panel {
+        from {
+          transform: translateY(50px) scale(0.94);
+          opacity: 0.5;
+        }
+        to {
+          transform: none;
+          opacity: 1;
+        }
+      }
+      @keyframes read-progress {
+        to {
+          transform: scaleX(1);
+        }
+      }
+      @media (max-width: 620px) {
+        h1 {
+          font-size: clamp(40px, 12vw, 66px);
+        }
+        h2 {
+          font-size: clamp(36px, 10vw, 54px);
+        }
+        .chapter {
+          grid-template-columns: 1fr;
+          gap: 36px;
+          padding: 95px 26px 65px;
+        }
+        .stage {
+          min-height: 250px;
+        }
+        .copy {
+          gap: 20px;
+        }
+        .masthead {
+          padding: 22px 26px;
+          font-size: 12px;
+        }
+        .chapter p {
+          font-size: 16px;
+        }
+        .chapter-link {
+          display: none;
+        }
+        footer {
+          flex-direction: column;
+        }
+        .section-nav {
+          gap: 16px;
+        }
+      }
+      @media (max-height: 560px) {
+        .chapter {
+          padding: 66px 28px 48px;
+          gap: 24px;
+        }
+        .stage {
+          min-height: 230px;
+        }
+        .copy {
+          gap: 15px;
+        }
+        h1 {
+          font-size: clamp(34px, 5.5vw, 57px);
+        }
+        h2 {
+          font-size: clamp(32px, 5vw, 48px);
+        }
+        p,
+        .chapter p {
+          font-size: 14px;
+        }
+        .masthead {
+          padding: 18px 28px;
+        }
+        .scroll-note {
+          font-size: 12px;
+        }
+        .scroll-note span {
+          height: 27px;
+        }
+        .chapter .chapter-link {
+          bottom: 15px;
+        }
+        .note {
+          font-size: 12px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *:before,
+        *:after {
+          animation: none !important;
+          transition: none !important;
+        }
+        .motion-art,
+        .reveal {
+          transform: none !important;
+          opacity: 1 !important;
+        }
+        .reading-progress {
+          display: none;
+        }
+      }
+      body {
+        --bg: #eef5f2;
+        --ink: #193e3b;
+        --accent: #21665f;
+        --panel: #d2e5df;
+      }
+      .design-cover {
+        background: #eef5f2;
+      }
+      .privacy-object {
+        width: 280px;
+        height: 280px;
+        position: relative;
+        display: grid;
+        place-items: center;
+        transform-style: preserve-3d;
+        transform: rotateY(calc(-20deg + var(--travel, 0) * 25deg))
+          rotateX(12deg) rotateZ(calc(-10deg + var(--travel, 0) * 10deg));
+      }
+      .privacy-ring {
+        position: absolute;
+        inset: 0;
+        border: 32px solid #accdc3;
+        border-radius: 50%;
+        transform: translateZ(-35px);
+      }
+      .privacy-ring:nth-child(2) {
+        inset: 25px;
+        border: 18px solid #d2e5df;
+        transform: translateZ(15px);
+      }
+      .privacy-lock {
+        width: 122px;
+        height: 117px;
+        border-radius: 24px;
+        background: #21665f;
+        position: relative;
+        display: grid;
+        place-items: center;
+        transform: translateZ(65px);
+      }
+      .privacy-lock:before {
+        content: "";
+        position: absolute;
+        width: 70px;
+        height: 75px;
+        border: 13px solid #21665f;
+        border-bottom: 0;
+        bottom: 90px;
+        left: 26px;
+        border-radius: 50px 50px 0 0;
+      }
+      .privacy-lock:after {
+        content: "";
+        width: 16px;
+        height: 40px;
+        background: #eef5f2;
+        clip-path: polygon(
+          50% 0,
+          90% 13%,
+          90% 40%,
+          66% 57%,
+          80% 100%,
+          20% 100%,
+          34% 57%,
+          10% 40%,
+          10% 13%
+        );
+      }
+      .privacy-label {
+        position: absolute;
+        right: -30px;
+        bottom: 0;
+        padding: 14px 20px;
+        background: #fff;
+        font-size: 15px;
+        transform: translateZ(100px) rotateZ(10deg);
+        border-radius: 99px;
+      }
+      .gate-chapter {
+        background: #173e3a;
+        color: #eef5f2;
+        clip-path: polygon(0 0, 100% 4%, 100% 100%, 0 100%);
+        margin-top: -3svh;
+      }
+      .gate {
+        background: #f6faf6;
+        color: #193e3b;
+        padding: clamp(24px, 4vw, 42px);
+        width: 100%;
+        border-radius: 18px;
+        container-type: inline-size;
+        transform: rotate(2deg);
+        transition: transform 0.6s;
+      }
+      .gate:has(.gate-content:not([hidden])) {
+        transform: rotate(0);
+      }
+      .gate-icon {
+        width: 45px;
+        height: 45px;
+        margin-bottom: 22px;
+      }
+      .gate h3 {
+        font-size: 30px;
+        letter-spacing: -0.05em;
+        margin-bottom: 13px;
+      }
+      .gate p {
+        font-size: 15px;
+        margin-bottom: 20px;
+      }
+      .gate label {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 9px;
+      }
+      .gate input {
+        width: 100%;
+        border: 0;
+        background: #e1ede5;
+        padding: 15px 16px;
+        border-radius: 6px;
+        color: #173e3a;
+        min-height: 48px;
+      }
+      .gate .pill-button {
+        width: 100%;
+        margin-top: 12px;
+        background: #21665f;
+        color: #fff;
+      }
+      .gate .feedback {
+        font-size: 13px;
+        margin: 12px 0 0;
+        min-height: 22px;
+      }
+      .gate-content[hidden],
+      .gate-form[hidden] {
+        display: none;
+      }
+      .gate-content {
+        animation: openDemo 0.6s both;
+      }
+      .gate-content svg {
+        color: #21665f;
+      }
+      .gate-content h3 {
+        margin: 18px 0 12px;
+      }
+      .gate-content p {
+        margin-bottom: 0;
+      }
+      .access-chapter {
+        background: #c9e2d7;
+        color: #193e3b;
+        clip-path: polygon(0 4%, 100% 0, 100% 100%, 0 100%);
+        margin-top: -3svh;
+      }
+      .access-choice {
+        width: 100%;
+        padding: 35px;
+        border: 0;
+        background: #edf6ee;
+        transform: rotate(-3deg);
+        border-radius: 16px;
+        margin: 0;
+        display: grid;
+        gap: 18px;
+      }
+      .access-choice legend {
+        float: left;
+        font-size: 27px;
+        letter-spacing: -0.04em;
+        margin-bottom: 10px;
+      }
+      .access-choice label {
+        display: flex;
+        gap: 13px;
+        align-items: center;
+        padding: 17px;
+        background: #dbece0;
+        border-radius: 9px;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          background 0.2s;
+      }
+      .access-choice label:has(input:checked) {
+        background: #21665f;
+        color: #fff;
+        transform: translateX(8px);
+      }
+      .access-choice input {
+        accent-color: #21665f;
+        width: 18px;
+        height: 18px;
+      }
+      .access-result {
+        font-size: 15px;
+        line-height: 1.7;
+      }
+      .private-result {
+        display: none;
+      }
+      .access-choice:has(input[value="private"]:checked) .private-result {
+        display: block;
+      }
+      .access-choice:has(input[value="private"]:checked) .public-result {
+        display: none;
+      }
+      .design-footer {
+        background: #c9e2d7;
+      }
+      @keyframes openDemo {
+        from {
+          opacity: 0;
+          transform: translateY(20px) rotateX(-12deg);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @media (max-width: 620px) {
+        .privacy-object {
+          scale: 0.8;
+        }
+        .gate {
+          padding: 25px;
+        }
+        .access-choice {
+          padding: 26px;
+        }
+      }
+      @media (max-width: 620px) and (max-height: 560px) {
+        .design-cover .stage {
+          min-height: 145px;
+          height: 145px;
+        }
+        .privacy-object {
+          scale: 0.5;
+        }
+        .design-cover {
+          gap: 0;
+        }
+        .design-cover .scroll-note {
+          display: none;
+        }
+      }
+      @media (max-width: 620px) and (max-height: 560px) {
+        .design-cover {
+          padding: 60px 24px 20px;
+        }
+        .design-cover .stage {
+          height: 100px;
+          min-height: 100px;
+        }
+        .privacy-object {
+          scale: 0.4;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reading-progress" aria-hidden="true"></div>
+    <header class="masthead">
+      <a href="#top">HTMLinks / Product design</a
+      ><span>Access design · HTML sample</span>
+    </header>
+    <main>
+      <section class="chapter design-cover" id="top">
+        <div class="copy">
+          <h1>Private.<br />By choice.</h1>
+          <p>
+            A design review for sharing work with the right people. One link,
+            with a password when it matters.
+          </p>
+          <a class="scroll-note" href="#try-gate"
+            ><span aria-hidden="true"></span>Scroll to try the experience ↓</a
+          >
+        </div>
+        <div
+          class="stage"
+          aria-label="A three-dimensional lock surrounded by layers of access"
+        >
+          <div class="privacy-object motion-art">
+            <div class="privacy-ring"></div>
+            <div class="privacy-ring"></div>
+            <div class="privacy-lock"></div>
+            <span class="privacy-label">Only the people you choose.</span>
+          </div>
+        </div>
+      </section>
+      <section class="chapter gate-chapter" id="try-gate">
+        <div class="copy reveal">
+          <h2>A little friction.<br />A clear purpose.</h2>
+          <p>
+            The reader opens a link, enters a password, and gets the document.
+            No account to create. No workspace to join.
+          </p>
+          <p>Try the interaction with <strong>open-sesame</strong>.</p>
+          <p class="note">
+            This is a client-side design mockup with a public demo password.
+            Real HTMLinks checks the password on the server before delivering
+            any protected HTML.
+          </p>
+        </div>
+        <div class="stage">
+          <div class="gate reveal">
+            <div class="gate-form" id="gate-form">
+              <svg
+                class="gate-icon"
+                viewBox="0 0 48 48"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M14 21V14a10 10 0 0 1 20 0V21" />
+                <rect x="8" y="21" width="32" height="23" rx="6" />
+                <path d="M24 29V36" />
+              </svg>
+              <h3>This one's private.</h3>
+              <p>Enter the document password to continue.</p>
+              <label for="document-password">Document password</label
+              ><input
+                id="document-password"
+                type="password"
+                autocomplete="off"
+                placeholder="Try open-sesame"
+                aria-describedby="gate-feedback"
+              /><button class="pill-button" id="open-document" type="button">
+                Open document ↗
+              </button>
+              <p
+                class="feedback"
+                id="gate-feedback"
+                role="status"
+                aria-live="polite"
+              ></p>
+            </div>
+            <div class="gate-content" id="gate-content" hidden tabindex="-1">
+              <svg
+                width="50"
+                height="50"
+                viewBox="0 0 50 50"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <circle cx="25" cy="25" r="22" />
+                <path d="m14 25 8 8 16-17" />
+              </svg>
+              <h3>You're in.</h3>
+              <p>
+                The link stays the same. The document opens after access is
+                checked.
+              </p>
+              <button class="pill-button" id="reset-gate" type="button">
+                Try it again
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="chapter access-chapter" id="access">
+        <div class="copy reveal">
+          <h2>Your work.<br />Your audience.</h2>
+          <p>
+            Access is a decision for each document. A public presentation and a
+            private technical design can use the same publishing workflow.
+          </p>
+          <p>
+            Content edits preserve the password. Changing access rules
+            invalidates existing viewer sessions.
+          </p>
+          <nav class="section-nav" aria-label="Document chapters">
+            <a href="#try-gate">Try the password gate ↑</a
+            ><a href="#top">Back to the design</a>
+          </nav>
+        </div>
+        <div class="stage">
+          <fieldset class="access-choice reveal">
+            <legend>Who can open this?</legend>
+            <label
+              ><input type="radio" name="access" value="public" />Anyone with
+              the link</label
+            ><label
+              ><input
+                type="radio"
+                name="access"
+                value="private"
+                checked
+              />People with the password</label
+            >
+            <p class="access-result public-result">
+              The link opens immediately. Choose this for work you're ready to
+              share openly.
+            </p>
+            <p class="access-result private-result">
+              Readers enter a password before receiving the document. Share that
+              password separately.
+            </p>
+            <span class="note"
+              >Design preview only. This control doesn't change a published
+              file.</span
+            >
+          </fieldset>
+        </div>
+      </section>
+    </main>
+    <footer class="design-footer">
+      <span>HTMLinks · Sharing with intent</span
+      ><span
+        >Sample design review. No real document is protected by this demo.</span
+      >
+    </footer>
+    <script>
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+      const chapters = [...document.querySelectorAll(".chapter")];
+      let frame = 0;
+      function paint() {
+        frame = 0;
+        for (const chapter of chapters) {
+          const r = chapter.getBoundingClientRect();
+          if (r.bottom < 0 || r.top > innerHeight) continue;
+          const p = Math.max(0, Math.min(1, -r.top / Math.max(1, r.height)));
+          chapter.style.setProperty("--travel", reduced.matches ? 0 : p);
+        }
+        if (!CSS.supports("animation-timeline: scroll()")) {
+          document.querySelector(".reading-progress").style.transform =
+            "scaleX(" +
+            scrollY /
+              Math.max(1, document.documentElement.scrollHeight - innerHeight) +
+            ")";
+        }
+      }
+      function schedule() {
+        if (!frame) frame = requestAnimationFrame(paint);
+      }
+      addEventListener("scroll", schedule, { passive: true });
+      addEventListener("resize", schedule);
+      reduced.addEventListener("change", schedule);
+      paint();
+      const input = document.getElementById("document-password"),
+        feedback = document.getElementById("gate-feedback"),
+        form = document.getElementById("gate-form"),
+        content = document.getElementById("gate-content");
+      function openDemo() {
+        if (input.value === "open-sesame") {
+          form.hidden = true;
+          content.hidden = false;
+          content.focus();
+        } else {
+          feedback.textContent =
+            "That password did not match. Try open-sesame.";
+          input.setAttribute("aria-invalid", "true");
+        }
+      }
+      document
+        .getElementById("open-document")
+        .addEventListener("click", openDemo);
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          openDemo();
+        }
+      });
+      input.addEventListener("input", () => {
+        input.removeAttribute("aria-invalid");
+        feedback.textContent = "";
+      });
+      document.getElementById("reset-gate").addEventListener("click", () => {
+        form.hidden = false;
+        content.hidden = true;
+        input.value = "";
+        feedback.textContent = "";
+        input.focus();
+      });
+    </script>
+  </body>
+</html>
