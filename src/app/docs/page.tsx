@@ -5,6 +5,7 @@ import { config } from "@/lib/config";
 import { pageMetadata, webPageSchema } from "@/lib/seo";
 import { jsonLd } from "@/lib/seo-policy";
 import { guides } from "@/lib/guides";
+import { selfHostCommand } from "@/lib/deployment";
 export const dynamic = "force-dynamic";
 const title = "HTML Publishing Setup, CLI and API";
 const description =
@@ -244,12 +245,13 @@ export default function Docs() {
               HTMLinks on your own server with either option.
             </p>
             <p>
-              To start with local PostgreSQL, run these commands with Docker
-              Compose and Node.js 22.22+ installed. The setup creates your{" "}
-              <code>.env</code> file and configures the database for you:
+              Install Docker with Compose, then download the deployment bundle.
+              Setup generates your private <code>.env</code> configuration
+              inside Docker. The server needs no Node.js installation or source
+              checkout:
             </p>
             <pre>
-              <code>{`git clone https://github.com/michael-elkabetz/HTMLinks.git\ncd HTMLinks\nnode scripts/init.mjs\ndocker compose up --build -d`}</code>
+              <code>{selfHostCommand}</code>
             </pre>
             <p>
               Open <code>http://localhost:3000</code> and install the skill from
@@ -290,9 +292,9 @@ export default function Docs() {
             <h2>Configure Supabase database and storage.</h2>
             <p>
               Create a Supabase project and a private Storage bucket named{" "}
-              <code>htmlinks</code>. In your HTMLinks checkout, run{" "}
-              <code>node scripts/init.mjs</code> if you haven’t already, then
-              update these values in <code>.env</code>:
+              <code>htmlinks</code>. In your extracted deployment directory, run{" "}
+              <code>sh setup.sh</code> if you haven’t already, then update these
+              values in <code>.env</code>:
             </p>
             <pre>
               <code>{`# Your Supabase Postgres connection string
@@ -311,7 +313,7 @@ SUPABASE_BUCKET=htmlinks`}</code>
               to your Supabase database and storage and runs migrations for you:
             </p>
             <pre>
-              <code>docker compose -f compose.cloud.yaml up --build -d</code>
+              <code>docker compose -f compose.cloud.yaml up -d --wait</code>
             </pre>
             <p>
               If migrations need a separate database connection, also set{" "}

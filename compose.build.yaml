@@ -1,0 +1,12 @@
+# Source-checkout override: docker compose -f compose.yaml -f compose.build.yaml up --build -d
+x-build: &build
+  build: .
+  image: htmlinks:local
+  pull_policy: build
+services:
+  migrate:
+    <<: *build
+  web:
+    <<: *build
+  maintenance:
+    <<: *build

@@ -14,8 +14,11 @@ COPY public ./public
 COPY skills ./skills
 RUN npm run build
 FROM base AS runner
+ARG IMAGE_VERSION=dev
+ARG VCS_REF=unknown
 ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0
-LABEL org.opencontainers.image.title="HTMLinks" org.opencontainers.image.description="Publish HTML. Keep the link." org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.title="HTMLinks" org.opencontainers.image.description="Publish HTML. Keep the link." org.opencontainers.image.licenses="MIT" org.opencontainers.image.source="https://github.com/michael-elkabetz/HTMLinks"
+LABEL org.opencontainers.image.version=$IMAGE_VERSION org.opencontainers.image.revision=$VCS_REF
 COPY --from=builder --chown=node:node /app/.next/standalone ./
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 COPY --from=builder --chown=node:node /app/public ./public

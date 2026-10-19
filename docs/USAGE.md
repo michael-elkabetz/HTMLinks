@@ -6,16 +6,19 @@ Detailed setup, CLI, API, and development reference. Run commands from the repos
 
 ## Run it yourself
 
-Requires Docker Compose and Node.js 22.22+ for initialization. Get the source and run:
+Requires Docker with Compose v2.20+ and a POSIX shell on Linux, macOS, or WSL2. Download the deployment bundle; no Node.js installation or source checkout is needed on the server:
 
 ```sh
-git clone https://github.com/michael-elkabetz/HTMLinks.git
-cd HTMLinks
-node scripts/init.mjs
-docker compose up --build -d
+curl -fL https://github.com/michael-elkabetz/HTMLinks/releases/download/v0.1.0/htmlinks-0.1.0.tar.gz -o htmlinks.tar.gz
+tar -xzf htmlinks.tar.gz
+cd htmlinks
+sh setup.sh
+docker compose up -d --wait
 ```
 
 Open [localhost:3000](http://localhost:3000). Install the skill from the landing page. There is no account to create. Shared pages use the same origin under `/rendered/`.
+
+Use `sh setup.sh --url https://htmlinks.example.com` before first startup for a public origin, or edit existing `.env` settings directly. The publishing helper requires Node.js 22.22+ on your agent's computer. See [deployment and upgrades](DEPLOYMENT.md) for operations. To build from a source checkout, use `node scripts/init.mjs` followed by `docker compose -f compose.yaml -f compose.build.yaml up --build -d --wait`.
 
 Set `APP_URL` to your canonical origin; the web service serves `/rendered/` links with opaque content sandboxing. See [same-domain hosting](SHARED-DOMAIN.md). For a busy port, change `APP_URL` and `HTMLINKS_PORT` in `.env`. Local ports bind to loopback. `docker compose down` preserves data; removing volumes destroys it.
 
@@ -115,9 +118,12 @@ refreshes that inline diagram before rebuilding the previews.
 npm run release:check
 npm run check:integration
 npm run check:skill-install
+npm run check:docker -- --image htmlinks:local
 ```
 
 Integration checks create a disposable database on a loopback PostgreSQL service and launch one web service on port 4310. They test anonymous publishing, per-document permissions, encrypted retry responses, password revocation, source/history access, conflicts, recovery, the installed skill, and same-domain password delivery and sandboxing. The runner stops its servers and drops the test database. `-- --keep-database` preserves it for manual inspection.
+
+Docker checks require an already-built image (`docker build -t htmlinks:local .`). They run from an extracted deployment bundle, create isolated Compose projects, and remove only their own containers and volumes afterward. They cover initialization, passwords, updates, persistence, backup/restore, runtime origins, maintenance, and migration failures. Pass `--previous-image <image>` to verify a real image upgrade; PR CI builds the base revision and runs this check on native AMD64 and ARM64 runners.
 
 ## Managed hosting
 

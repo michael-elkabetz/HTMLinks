@@ -8,6 +8,7 @@ import { LandingJourney, SceneTransition } from "@/components/landing-journey";
 import { ProductDetails } from "@/components/product-details";
 import { pageMetadata, siteDescription, siteEntities } from "@/lib/seo";
 import { jsonLd } from "@/lib/seo-policy";
+import { selfHostCommand } from "@/lib/deployment";
 export const dynamic = "force-dynamic";
 export function generateMetadata() {
   return pageMetadata(
@@ -17,8 +18,6 @@ export function generateMetadata() {
   );
 }
 export default function Home() {
-  const selfHostCommand =
-    "git clone https://github.com/michael-elkabetz/HTMLinks.git\ncd HTMLinks\nnode scripts/init.mjs\ndocker compose up --build -d";
   return (
     <>
       <SiteHeader />

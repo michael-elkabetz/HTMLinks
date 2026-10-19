@@ -14,7 +14,11 @@ After deploying, verify `/robots.txt`, `/sitemap.xml`, page-specific canonical U
 
 Install the agent skill from GitHub with `npx skills add michael-elkabetz/HTMLinks --skill htmlinks`. It includes the standalone upload helper. Use the first-use question to select this instance’s app origin; installation does not choose a hosting destination. The instance-specific `/install` script remains available as an alternative.
 
-Run `node scripts/init.mjs`, then `docker compose up --build -d`. Initialization writes `.env` with private permissions and unique database/encryption secrets. Rerunning never overwrites an existing file. Open the landing page and install the skill. There is no account, setup token, or registration step. On first use, choose self-hosted and provide the app origin; the skill remembers it in a private local settings file. The same skill can later switch to managed hosting with its config command.
+Download and extract the versioned deployment archive from [GitHub releases](https://github.com/michael-elkabetz/HTMLinks/releases). Requires Docker with Compose v2.20+ and a POSIX shell on Linux, macOS, or WSL2. Run `sh setup.sh`, then `docker compose up -d --wait`. No host Node.js installation or source checkout is required. The release includes matching Compose files, setup script, configuration example, and an operations README. Verify the archive against the release's `SHA256SUMS` using `sha256sum -c SHA256SUMS` (Linux) or `shasum -a 256 -c SHA256SUMS` (macOS).
+
+For a public origin, initialize with `sh setup.sh --url https://htmlinks.example.com`. Initialization runs inside the application image and writes `.env` with private permissions, the pinned application image, and unique database/encryption secrets. Rerunning never overwrites an existing file. Edit existing `.env` settings directly. Open the landing page and install the skill on your agent's computer, where the publishing helper requires Node.js 22.22+. There is no account, setup token, or registration step. On first use, choose self-hosted and provide the app origin; the skill remembers it in a private local settings file.
+
+Production Compose pulls `ghcr.io/michael-elkabetz/htmlinks:<version>` for Linux AMD64 or ARM64. A source checkout can instead use `node scripts/init.mjs` and `docker compose -f compose.yaml -f compose.build.yaml up --build -d --wait`. The build override also works with `compose.cloud.yaml`.
 
 Compose starts PostgreSQL, a one-shot migration, one web service, and maintenance. The web service handles publishing and sandboxed document delivery under `/rendered/`. PostgreSQL is private to the Compose network. Local ports bind to loopback.
 
@@ -44,6 +48,32 @@ See `.env.example`. `MAX_UPLOAD_BYTES` can lower the 10 MiB limit. The internal 
 Migrations are ordered SQL files recorded in `htmlinks.migrations`. The runner holds an advisory transaction lock. Migration failures stop service startup. Back up before upgrades; there are no automatic down migrations. Pin the same application image across web, migration, and maintenance processes.
 
 Runtime readiness is `/api/health`. Keep it internal to the proxy or monitoring. Container startup checks database reachability and migration metadata; it does not guarantee object storage availability. Request failures return a request ID and log exception name/code/location without SQL parameters, document contents, credentials, or passwords.
+
+## Upgrade an image-based installation
+
+Read the target release notes and [back up](#back-up-and-restore) PostgreSQL, uploads, and `.env` before changing application versions. Download and extract the target release bundle into a separate directory; review and copy its Compose files and setup script into your existing installation directory. Preserve `.env`, custom proxy settings, and any Compose project override. Set `HTMLINKS_IMAGE` in `.env` to the target release's exact tag. All application roles use that same setting.
+
+Run from the existing installation directory:
+
+```sh
+docker compose pull
+docker compose stop web maintenance
+docker compose rm -f migrate
+docker compose up -d --wait
+docker compose logs --tail=50 migrate web maintenance
+```
+
+Removing only the completed migration container ensures migrations execute again. Writers stay stopped until migration succeeds. Verify an existing shared document, a password-protected document, and a document update before returning traffic. If migration fails, keep web and maintenance stopped and inspect migration logs. Restoring an earlier image alone does not reverse migrations: restore the coordinated backup and original secrets into an isolated instance on the old image, verify it, then change traffic.
+
+To switch an older source-build installation to images, keep its existing `.env`, `HTMLINKS_SECRET` (or `HSTORE_SECRET`), Compose project name, database identity, and volumes. Add the pinned `HTMLINKS_IMAGE` setting and use the new production Compose file without the build override. The default `hstore` project identity is deliberately preserved. PostgreSQL stays on major version 17; database major upgrades are separate work. For Supabase, use `-f compose.cloud.yaml` on each command and coordinate external database/storage backups.
+
+## Publishing a release
+
+The release workflow runs on `v<package-version>` tags and optional prerelease suffixes, for example `v0.1.0-rc.1`. Update the package version, lockfile, default image references, and download URLs together when advancing the base version. Run `npm run release:check`, build the image, and run `npm run check:docker -- --image <image>` before tagging.
+
+The workflow validates the tag against `package.json`, runs the application checks and Docker lifecycle tests on native AMD64 and ARM64 runners, and publishes those exact tested images. It assembles a multi-platform GHCR tag and attaches the matching deployment archive and checksum to a GitHub release. Prereleases do not advance `latest`; production examples pin an exact release. `npm run release:bundle -- --version v0.1.0-rc.1` builds a preview archive locally without publishing.
+
+On the first publication, make the GHCR package public in its package settings and verify an anonymous pull on both architectures. Registry publication uses the workflow's `GITHUB_TOKEN` with `packages: write`; no operator registry account is required for public pulls. Do not advertise the release as installable until its public image and deployment archive both exist. Published release tags must not be moved or reused.
 
 ## Supabase
 

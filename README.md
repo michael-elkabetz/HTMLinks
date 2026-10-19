@@ -70,18 +70,19 @@ node skills/htmlinks/scripts/htmlinks.mjs config --hosting managed --url https:/
 
 ## Self-host
 
-Requires **Docker Compose** and **Node.js 22.22+** for initialization.
+Requires **Docker with Compose v2.20+** and a POSIX shell (Linux, macOS, or WSL2). No Node.js installation or source checkout is needed on the server. Download the deployment bundle:
 
 ```sh
-git clone https://github.com/michael-elkabetz/HTMLinks.git
-cd HTMLinks
-node scripts/init.mjs
-docker compose up --build -d
+curl -fL https://github.com/michael-elkabetz/HTMLinks/releases/download/v0.1.0/htmlinks-0.1.0.tar.gz -o htmlinks.tar.gz
+tar -xzf htmlinks.tar.gz
+cd htmlinks
+sh setup.sh
+docker compose up -d --wait
 ```
 
-Open [localhost:3000](http://localhost:3000). The web service serves the site, publishing API, and shared pages at `/rendered/<public-id>`. Set `APP_URL` to your canonical origin; uploaded HTML stays in an opaque sandbox. See the [same-domain hosting guide](docs/SHARED-DOMAIN.md).
+Open [localhost:3000](http://localhost:3000). Images support Linux AMD64 and ARM64. Setup generates unique secrets and preserves existing configuration. For a public instance, use `sh setup.sh --url https://htmlinks.example.com` before the first start and configure an HTTPS reverse proxy. The web service serves the site, publishing API, and shared pages at `/rendered/<public-id>`; uploaded HTML stays in an opaque sandbox. See [deployment and upgrades](docs/DEPLOYMENT.md) and the [same-domain hosting guide](docs/SHARED-DOMAIN.md).
 
-Prefer the terminal? From the checkout:
+The publishing helper still requires Node.js 22.22+ on your agent's computer. From a source checkout:
 
 ```sh
 node skills/htmlinks/scripts/htmlinks.mjs config --hosting self-hosted --url http://localhost:3000
@@ -90,6 +91,8 @@ node skills/htmlinks/scripts/htmlinks.mjs update <document-id> ./revised.html
 ```
 
 [CLI, API, and development instructions →](docs/USAGE.md)
+
+To build the image from source instead, clone this repository, run `node scripts/init.mjs`, then `docker compose -f compose.yaml -f compose.build.yaml up --build -d --wait`.
 
 ## Examples
 

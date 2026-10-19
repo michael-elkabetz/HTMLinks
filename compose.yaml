@@ -1,13 +1,12 @@
 # Preserve the Compose project identity so upgrades reuse existing volumes.
 name: hstore
 x-app: &app
-  build: .
-  image: htmlinks:local
+  image: ${HTMLINKS_IMAGE:-ghcr.io/michael-elkabetz/htmlinks:0.1.0}
   init: true
   restart: unless-stopped
   env_file: .env
   environment: &environment
-    DATABASE_URL: postgres://hstore:${POSTGRES_PASSWORD:?Run npm run init first}@db:5432/hstore
+    DATABASE_URL: postgres://hstore:${POSTGRES_PASSWORD:?Run sh setup.sh first}@db:5432/hstore
     STORAGE_PATH: /app/data/uploads
   depends_on:
     migrate:
@@ -21,7 +20,7 @@ services:
     environment:
       POSTGRES_USER: hstore
       POSTGRES_DB: hstore
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run npm run init first}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run sh setup.sh first}
     volumes:
       - postgres:/var/lib/postgresql/data
     healthcheck:

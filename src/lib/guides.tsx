@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { selfHostCommand } from "./deployment";
 
 export type Guide = {
   path: string;
@@ -238,11 +239,12 @@ export function guides(origin: string): Guide[] {
               <p>
                 HTMLinks is MIT-licensed and can run on your infrastructure.
                 Docker Compose provides PostgreSQL, migrations, private upload
-                storage, the web service, and maintenance. Install Docker
-                Compose and Node.js 22.22+ before initialization.
+                storage, the web service, and maintenance. Install Docker with
+                Compose; the server needs no Node.js installation or source
+                checkout.
               </p>
               <pre>
-                <code>{`git clone https://github.com/michael-elkabetz/HTMLinks.git\ncd HTMLinks\nnode scripts/init.mjs\ndocker compose up --build -d`}</code>
+                <code>{selfHostCommand}</code>
               </pre>
               <p>
                 Open <code>http://localhost:3000</code>. The site, API, and

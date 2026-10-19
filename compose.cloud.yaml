@@ -1,8 +1,7 @@
 # Keep the existing service identity during upgrades.
 name: hstore-cloud
 x-cloud: &cloud
-  image: htmlinks:local
-  build: .
+  image: ${HTMLINKS_IMAGE:-ghcr.io/michael-elkabetz/htmlinks:0.1.0}
   init: true
   restart: unless-stopped
   env_file: .env

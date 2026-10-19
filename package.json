@@ -16,7 +16,7 @@
     "db:migrate": "node --env-file-if-exists=.env scripts/migrate.mjs",
     "supabase:setup": "node --env-file-if-exists=.env scripts/setup-supabase.mjs && npm run db:migrate",
     "maintenance": "node --env-file-if-exists=.env scripts/maintenance.mjs",
-    "check": "node --experimental-strip-types --test src/lib/*.test.ts scripts/skill.test.mjs scripts/setup-supabase.test.mjs",
+    "check": "node --experimental-strip-types --test src/lib/*.test.ts scripts/skill.test.mjs scripts/setup-supabase.test.mjs scripts/init.test.mjs scripts/package-deployment.test.mjs",
     "check:integration": "node --env-file-if-exists=.env scripts/verify-integration.mjs",
     "check:skill-install": "node scripts/verify-skill-install.mjs",
     "typecheck": "next typegen && tsc --noEmit",
@@ -24,7 +24,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "release:check": "node scripts/release.mjs",
-    "examples:sync": "node scripts/sync-examples.mjs"
+    "examples:sync": "node scripts/sync-examples.mjs",
+    "check:docker": "node scripts/verify-docker.mjs",
+    "release:bundle": "node scripts/package-deployment.mjs"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.2.2",
