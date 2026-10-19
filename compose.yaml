@@ -47,7 +47,15 @@ services:
     <<: *app
     command: ["node", "scripts/maintenance.mjs", "--loop"]
     healthcheck:
-      disable: true
+      test:
+        - CMD
+        - node
+        - --input-type=module
+        - -e
+        - "import postgres from 'postgres'; const sql = postgres(process.env.DATABASE_URL, { max: 1, prepare: false }); try { await sql.unsafe('SELECT 1 FROM htmlinks.migrations LIMIT 1'); } finally { await sql.end(); }"
+      interval: 30s
+      timeout: 5s
+      retries: 3
 volumes:
   postgres:
   uploads:
