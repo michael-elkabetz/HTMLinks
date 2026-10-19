@@ -1,0 +1,64 @@
+# Matches the Supabase project region: Central EU (Frankfurt).
+# Run `npm run supabase:setup` with production credentials before the first deploy.
+services:
+  - type: web
+    name: htmlinks-web
+    region: frankfurt
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    preDeployCommand: node scripts/migrate.mjs
+    healthCheckPath: /api/health
+    envVars:
+      - fromGroup: htmlinks-shared
+      - key: APP_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+
+  - type: cron
+    name: htmlinks-maintenance
+    region: frankfurt
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    schedule: "*/5 * * * *"
+    dockerCommand: node scripts/maintenance.mjs
+    envVars:
+      - fromGroup: htmlinks-shared
+      - key: DATABASE_URL
+        fromService:
+          type: web
+          name: htmlinks-web
+          envVarKey: DATABASE_URL
+      - key: SUPABASE_URL
+        fromService:
+          type: web
+          name: htmlinks-web
+          envVarKey: SUPABASE_URL
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        fromService:
+          type: web
+          name: htmlinks-web
+          envVarKey: SUPABASE_SERVICE_ROLE_KEY
+
+envVarGroups:
+  - name: htmlinks-shared
+    envVars:
+      - key: HTMLINKS_SECRET
+        generateValue: true
+      - key: STORAGE_DRIVER
+        value: supabase
+      - key: SUPABASE_BUCKET
+        value: htmlinks
+      - key: MAX_UPLOAD_BYTES
+        value: "10485760"
+      - key: RETENTION_DAYS
+        value: "7"
+      # Enable only after verifying that ingress replaces X-Forwarded-For.
+      - key: TRUST_PROXY
+        value: "0"

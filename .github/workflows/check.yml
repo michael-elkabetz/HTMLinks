@@ -1,0 +1,104 @@
+name: Check
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+    inputs:
+      upload-images:
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: htmlinks
+          POSTGRES_PASSWORD: htmlinks-ci
+          POSTGRES_DB: htmlinks
+        ports:
+          - 5439:5432
+        options: >-
+          --health-cmd "pg_isready -U htmlinks -d htmlinks"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgres://htmlinks:htmlinks-ci@localhost:5439/htmlinks
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22.22.3"
+          cache: npm
+      - run: npm ci
+      - run: npm run init
+      - run: npm run release:check
+      - run: npm run check:skill-install
+      - run: npm run check:integration
+  docker:
+    name: Docker (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          path: source
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22.22.3"
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/build-push-action@v7
+        with:
+          context: source
+          load: true
+          tags: htmlinks:check
+          build-args: |
+            IMAGE_VERSION=${{ github.ref_name }}
+            VCS_REF=${{ github.sha }}
+          cache-from: type=gha,scope=docker-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=docker-${{ matrix.arch }}
+      - name: Check out the currently deployed source for upgrade testing
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: baseline
+      - name: Build previous image
+        if: github.event_name == 'pull_request'
+        uses: docker/build-push-action@v7
+        with:
+          context: baseline
+          load: true
+          tags: htmlinks:previous
+          cache-from: type=gha,scope=docker-${{ matrix.arch }}
+      - name: Test installation, persistence, backup/restore, and migrations
+        working-directory: source
+        env:
+          PREVIOUS_IMAGE: ${{ github.event_name == 'pull_request' && 'htmlinks:previous' || '' }}
+        run: |
+          if [ -n "$PREVIOUS_IMAGE" ]; then
+            node scripts/verify-docker.mjs --previous-image "$PREVIOUS_IMAGE"
+          else
+            node scripts/verify-docker.mjs
+          fi
+      - name: Export the tested image for release
+        if: inputs.upload-images
+        run: docker save htmlinks:check | zstd -T0 -o image.tar.zst
+      - uses: actions/upload-artifact@v4
+        if: inputs.upload-images
+        with:
+          name: docker-${{ matrix.arch }}
+          path: image.tar.zst
+          retention-days: 1

@@ -1,0 +1,39 @@
+# Keep the existing service identity during upgrades.
+name: hstore-cloud
+x-cloud: &cloud
+  image: ${HTMLINKS_IMAGE:-ghcr.io/michael-elkabetz/htmlinks:0.1.0}
+  init: true
+  restart: unless-stopped
+  env_file: .env
+  depends_on:
+    migrate:
+      condition: service_completed_successfully
+services:
+  migrate:
+    <<: *cloud
+    restart: "no"
+    command: ["node", "scripts/migrate.mjs"]
+    depends_on: []
+    healthcheck:
+      disable: true
+  web:
+    <<: *cloud
+    environment:
+      STORAGE_DRIVER: supabase
+    ports:
+      - "127.0.0.1:${HTMLINKS_PORT:-${HSTORE_PORT:-3000}}:3000"
+  maintenance:
+    <<: *cloud
+    environment:
+      STORAGE_DRIVER: supabase
+    command: ["node", "scripts/maintenance.mjs", "--loop"]
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - --input-type=module
+        - -e
+        - "import postgres from 'postgres'; const sql = postgres(process.env.DATABASE_URL, { max: 1, prepare: false }); try { await sql.unsafe('SELECT 1 FROM htmlinks.migrations LIMIT 1'); } finally { await sql.end(); }"
+      interval: 30s
+      timeout: 5s
+      retries: 3

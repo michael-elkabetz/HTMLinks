@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "An HTML publishing service",
+    "output": ".archify/architecture-publishing-example-20261017-211130/publishing-wide.html",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    {
+      "id": "author",
+      "type": "external",
+      "label": "Author\u2019s agent",
+      "sublabel": "Self-contained HTML",
+      "pos": [40, 60],
+      "size": [180, 76]
+    },
+    {
+      "id": "publisher",
+      "type": "backend",
+      "label": "Publishing API",
+      "sublabel": "Upload + management",
+      "pos": [330, 60],
+      "size": [180, 76]
+    },
+    {
+      "id": "metadata",
+      "type": "database",
+      "label": "PostgreSQL",
+      "sublabel": "Access + revisions",
+      "pos": [330, 300],
+      "size": [180, 76]
+    },
+    {
+      "id": "objects",
+      "type": "cloud",
+      "label": "Private files",
+      "sublabel": "Immutable HTML bytes",
+      "pos": [680, 60],
+      "size": [180, 76]
+    },
+    {
+      "id": "reader",
+      "type": "external",
+      "label": "Reader\u2019s browser",
+      "sublabel": "The sharing URL",
+      "pos": [970, 300],
+      "size": [180, 76]
+    },
+    {
+      "id": "viewer",
+      "type": "security",
+      "label": "Isolated viewer",
+      "sublabel": "Access-checked delivery",
+      "pos": [680, 300],
+      "size": [180, 76]
+    }
+  ],
+  "connections": [
+    {
+      "id": "upload",
+      "from": "author",
+      "to": "publisher",
+      "label": "Upload HTML",
+      "variant": "emphasis"
+    },
+    {
+      "id": "metadata-write",
+      "from": "publisher",
+      "to": "metadata",
+      "label": "Save metadata"
+    },
+    {
+      "id": "file-write",
+      "from": "publisher",
+      "to": "objects",
+      "label": "Store revision"
+    },
+    {
+      "id": "reader-open",
+      "from": "reader",
+      "to": "viewer",
+      "label": "Open link",
+      "variant": "emphasis"
+    },
+    {
+      "id": "file-read",
+      "from": "viewer",
+      "to": "objects",
+      "label": "Read allowed HTML"
+    },
+    {
+      "id": "access-check",
+      "from": "viewer",
+      "to": "metadata",
+      "label": "Check access",
+      "variant": "security"
+    }
+  ]
+}

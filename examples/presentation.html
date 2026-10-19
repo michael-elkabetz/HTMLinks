@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HTMLinks · A file becomes a place</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 0;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: Arial, Helvetica, sans-serif;
+        overflow-x: clip;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1,
+      h2 {
+        font-weight: 500;
+        letter-spacing: -0.065em;
+        line-height: 0.98;
+        text-wrap: balance;
+      }
+      h1 {
+        font-size: clamp(38px, 6.6vw, 88px);
+      }
+      h2 {
+        font-size: clamp(34px, 5.3vw, 70px);
+      }
+      h3 {
+        font-size: 22px;
+        font-weight: 500;
+        letter-spacing: -0.03em;
+      }
+      p {
+        font-size: clamp(16px, 1.6vw, 20px);
+        line-height: 1.65;
+        max-width: 490px;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button,
+      a,
+      input {
+        touch-action: manipulation;
+      }
+      button,
+      a {
+        color: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 5px;
+      }
+      a {
+        text-underline-offset: 5px;
+      }
+      .masthead {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 24px clamp(24px, 5vw, 72px);
+        z-index: 5;
+        font-size: 13px;
+      }
+      .masthead a {
+        text-decoration: none;
+      }
+      .reading-progress {
+        position: fixed;
+        z-index: 20;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--accent);
+        transform: scaleX(0);
+        transform-origin: left;
+      }
+      .chapter {
+        position: relative;
+        min-height: 100svh;
+        padding: 100px clamp(24px, 6vw, 88px) 80px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        align-items: center;
+        gap: clamp(30px, 6vw, 100px);
+        isolation: isolate;
+        container-type: inline-size;
+      }
+      .copy {
+        display: grid;
+        gap: 25px;
+        max-width: 570px;
+      }
+      .note {
+        font-size: 13px;
+        line-height: 1.6;
+        opacity: 0.75;
+      }
+      .scroll-note {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+      }
+      .scroll-note span {
+        display: block;
+        width: 23px;
+        height: 36px;
+        border: 2px solid currentColor;
+        border-radius: 16px;
+        position: relative;
+      }
+      .scroll-note span:after {
+        content: "";
+        position: absolute;
+        top: 6px;
+        left: 8px;
+        width: 3px;
+        height: 7px;
+        background: currentColor;
+        border-radius: 2px;
+      }
+      .stage {
+        position: relative;
+        min-width: 0;
+        min-height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        perspective: 1000px;
+      }
+      .section-nav {
+        display: flex;
+        gap: 22px;
+        flex-wrap: wrap;
+        font-size: 14px;
+        margin-top: 12px;
+      }
+      .section-nav a {
+        opacity: 0.8;
+      }
+      .pill-button {
+        border: 0;
+        background: var(--accent);
+        color: var(--bg);
+        padding: 14px 20px;
+        border-radius: 99px;
+        min-height: 46px;
+        transition: transform 0.2s;
+      }
+      .pill-button:hover {
+        transform: translateY(-3px);
+      }
+      footer {
+        padding: 30px clamp(24px, 6vw, 88px);
+        font-size: 13px;
+        line-height: 1.6;
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+      }
+      .reveal {
+        transform-origin: center;
+      }
+      .chapter .chapter-link {
+        position: absolute;
+        bottom: 28px;
+        left: clamp(24px, 6vw, 88px);
+        font-size: 13px;
+      }
+      .chapter code {
+        font-family: ui-monospace, monospace;
+        font-size: 0.85em;
+      }
+      pre {
+        font-size: 13px;
+        line-height: 1.9;
+        overflow: auto;
+        margin: 0;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      .motion-art {
+        transform: translateY(calc(var(--travel, 0) * -30px))
+          rotate(calc(var(--travel, 0) * -3deg));
+      }
+      .sample-tag {
+        font-size: 13px;
+        opacity: 0.7;
+      }
+      @supports (animation-timeline: scroll()) {
+        .reading-progress {
+          animation: read-progress linear both;
+          animation-timeline: scroll(root block);
+        }
+      }
+      @supports (animation-timeline: view()) {
+        .reveal {
+          animation: reveal-panel linear both;
+          animation-timeline: view();
+          animation-range: entry 0% entry 90%;
+        }
+      }
+      @keyframes reveal-panel {
+        from {
+          transform: translateY(50px) scale(0.94);
+          opacity: 0.5;
+        }
+        to {
+          transform: none;
+          opacity: 1;
+        }
+      }
+      @keyframes read-progress {
+        to {
+          transform: scaleX(1);
+        }
+      }
+      @media (max-width: 620px) {
+        h1 {
+          font-size: clamp(40px, 12vw, 66px);
+        }
+        h2 {
+          font-size: clamp(36px, 10vw, 54px);
+        }
+        .chapter {
+          grid-template-columns: 1fr;
+          gap: 36px;
+          padding: 95px 26px 65px;
+        }
+        .stage {
+          min-height: 250px;
+        }
+        .copy {
+          gap: 20px;
+        }
+        .masthead {
+          padding: 22px 26px;
+          font-size: 13px;
+        }
+        .chapter p {
+          font-size: 16px;
+        }
+        .chapter-link {
+          display: none;
+        }
+        footer {
+          flex-direction: column;
+        }
+        .section-nav {
+          gap: 16px;
+        }
+      }
+      @media (max-height: 560px) {
+        .chapter {
+          padding: 66px 28px 48px;
+          gap: 24px;
+        }
+        .stage {
+          min-height: 230px;
+        }
+        .copy {
+          gap: 15px;
+        }
+        h1 {
+          font-size: clamp(34px, 5.5vw, 57px);
+        }
+        h2 {
+          font-size: clamp(32px, 5vw, 48px);
+        }
+        p,
+        .chapter p {
+          font-size: 14px;
+        }
+        .masthead {
+          padding: 18px 28px;
+        }
+        .scroll-note {
+          font-size: 13px;
+        }
+        .scroll-note span {
+          height: 27px;
+        }
+        .chapter .chapter-link {
+          bottom: 15px;
+        }
+        .note {
+          font-size: 13px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *:before,
+        *:after {
+          animation: none !important;
+          transition: none !important;
+        }
+        .motion-art,
+        .reveal {
+          transform: none !important;
+          opacity: 1 !important;
+        }
+        .reading-progress {
+          display: none;
+        }
+      }
+      html {
+        scroll-snap-type: y proximity;
+      }
+      body {
+        --bg: #162b35;
+        --ink: #f1f4eb;
+        --accent: #d4ec96;
+        --panel: #294754;
+      }
+      .masthead {
+        position: fixed;
+        background: #162b35;
+        color: #fff;
+        pointer-events: none;
+      }
+      .masthead a {
+        pointer-events: auto;
+      }
+      .slide {
+        scroll-snap-align: start;
+        scroll-snap-stop: normal;
+        min-height: 100svh;
+        padding-bottom: 110px;
+      }
+      .slide:first-child {
+        background: #162b35;
+      }
+      .slide:nth-child(2) {
+        background: #d4ec96;
+        color: #1e392d;
+        clip-path: polygon(0 3%, 100% 0, 100% 100%, 0 100%);
+        margin-top: -3svh;
+      }
+      .slide:nth-child(3) {
+        background: #eaf1e9;
+        color: #1f3c36;
+        clip-path: polygon(0 0, 100% 4%, 100% 100%, 0 100%);
+        margin-top: -3svh;
+      }
+      .deck-file {
+        width: 270px;
+        height: 315px;
+        background: #d4ec96;
+        color: #1e392d;
+        padding: 30px;
+        display: grid;
+        align-content: space-between;
+        position: relative;
+        transform: rotate(calc(-12deg + var(--travel, 0) * 16deg))
+          rotateY(-12deg) translateY(calc(var(--travel, 0) * -25px));
+        transform-style: preserve-3d;
+        clip-path: polygon(0 0, 77% 0, 100% 20%, 100% 100%, 0 100%);
+      }
+      .deck-file:before {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 23%;
+        height: 20%;
+        background: #a6c270;
+        clip-path: polygon(0 0, 0 100%, 100% 100%);
+      }
+      .deck-file strong {
+        font-size: 66px;
+        font-weight: 500;
+        letter-spacing: -0.07em;
+        line-height: 1;
+      }
+      .deck-file span {
+        font-size: 14px;
+      }
+      .deck-file small {
+        font-size: 16px;
+        line-height: 1.5;
+      }
+      .file-orbit {
+        position: absolute;
+        inset: 0;
+        transform: rotate(-12deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .file-orbit:after {
+        content: "↗";
+        position: absolute;
+        right: 4%;
+        top: 12%;
+        width: 70px;
+        height: 70px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: #eaf1e9;
+        color: #1e392d;
+        font-size: 38px;
+        transform: rotate(12deg);
+      }
+      .hosting-split {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        transform-style: preserve-3d;
+        transform: rotateX(10deg) rotateY(-8deg);
+      }
+      .hosting-split article {
+        background: #d4ec96;
+        color: #1e392d;
+        padding: 28px 20px;
+        min-height: 240px;
+        display: grid;
+        align-content: space-between;
+        gap: 24px;
+        transform: translateY(-18px);
+      }
+      .hosting-split article + article {
+        background: #1e453f;
+        color: #eaf1e9;
+        transform: translateY(18px);
+      }
+      .hosting-split svg {
+        width: 56px;
+        height: 56px;
+      }
+      .hosting-split h3 {
+        font-size: 23px;
+      }
+      .hosting-split p {
+        font-size: 14px;
+        line-height: 1.65;
+      }
+      .deck-nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 28px;
+        gap: 24px;
+        background: #162b35;
+        color: #f1f4eb;
+        font-size: 14px;
+        font-variant-numeric: tabular-nums;
+      }
+      .deck-nav > div {
+        display: flex;
+        gap: 22px;
+      }
+      .deck-nav button {
+        border: 0;
+        border-radius: 0;
+        padding: 10px 0;
+        min-height: 44px;
+        background: transparent;
+        color: inherit;
+        font-size: 14px;
+      }
+      .deck-nav button:hover {
+        color: #d4ec96;
+      }
+      .deck-nav button:disabled {
+        opacity: 0.35;
+        cursor: default;
+      }
+      .deck-nav button:active {
+        transform: translateY(1px);
+      }
+      .slide .scroll-note span {
+        border-color: currentColor;
+      }
+      .slide .scroll-note span:after {
+        background: currentColor;
+      }
+      @media (max-width: 620px) {
+        .deck-file {
+          width: 230px;
+          height: 255px;
+          padding: 25px;
+        }
+        .deck-file strong {
+          font-size: 55px;
+        }
+        .hosting-split {
+          gap: 10px;
+        }
+        .hosting-split article {
+          padding: 22px 16px;
+          min-height: 210px;
+        }
+        .deck-nav {
+          padding: 10px 24px;
+        }
+        .deck-nav button {
+          padding: 10px 0;
+        }
+        .slide {
+          padding-bottom: 100px;
+        }
+      }
+      @media (max-height: 560px) {
+        .deck-file {
+          width: 200px;
+          height: 225px;
+          padding: 22px;
+        }
+        .deck-file strong {
+          font-size: 50px;
+        }
+        .deck-file small {
+          font-size: 13px;
+        }
+        .file-orbit:after {
+          width: 50px;
+          height: 50px;
+          font-size: 30px;
+        }
+        .slide {
+          padding-bottom: 80px;
+        }
+        .deck-nav {
+          bottom: 12px;
+          font-size: 13px;
+        }
+        .deck-nav button {
+          padding: 9px 14px;
+          min-height: 38px;
+        }
+        .hosting-split article {
+          min-height: 210px;
+          padding: 20px 15px;
+        }
+        .hosting-split h3 {
+          font-size: 20px;
+        }
+      }
+      @media (max-width: 620px) and (max-height: 560px) {
+        .slide:first-child {
+          gap: 5px;
+        }
+        .slide:first-child .stage {
+          min-height: 140px;
+          height: 140px;
+        }
+        .deck-file {
+          scale: 0.55;
+        }
+        .slide:first-child .scroll-note {
+          display: none;
+        }
+        .file-orbit:after {
+          display: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-snap-type: none;
+        }
+        .deck-file,
+        .hosting-split {
+          transform: none;
+        }
+      }
+      @media (max-width: 620px) and (max-height: 560px) {
+        .slide:first-child {
+          padding: 60px 24px 55px;
+        }
+        .slide:first-child .stage {
+          height: 80px;
+          min-height: 80px;
+        }
+        .slide:first-child .copy p {
+          font-size: 13px;
+        }
+        .deck-file {
+          scale: 0.4;
+        }
+      }
+
+      .conveyor {
+        width: 100%;
+        display: grid;
+        gap: 14px;
+        perspective: 800px;
+      }
+      .conveyor div {
+        background: #f4f8e9;
+        padding: 22px 26px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        transform: rotateY(-14deg) rotateZ(-3deg);
+        transform-origin: left;
+        transition: transform 0.3s;
+      }
+      .conveyor div:nth-child(2) {
+        margin-left: 25px;
+        transform: rotateY(-14deg) rotateZ(0);
+      }
+      .conveyor div:nth-child(3) {
+        margin-left: 50px;
+        transform: rotateY(-14deg) rotateZ(3deg);
+      }
+      .conveyor div:hover {
+        transform: none;
+      }
+      .conveyor strong {
+        display: block;
+        font-size: 20px;
+        font-weight: 500;
+      }
+      .conveyor small {
+        display: block;
+        font-size: 13px;
+        margin-top: 6px;
+        line-height: 1.6;
+      }
+      @media (max-width: 620px) {
+        .conveyor div {
+          padding: 20px;
+        }
+        .conveyor div:nth-child(3) {
+          margin-left: 25px;
+        }
+      }
+      @media (max-height: 560px) {
+        .conveyor {
+          gap: 9px;
+        }
+        .conveyor div {
+          padding: 15px 18px;
+          gap: 14px;
+        }
+        .conveyor strong {
+          font-size: 16px;
+        }
+        .conveyor small {
+          font-size: 13px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .conveyor div {
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reading-progress" aria-hidden="true"></div>
+    <header class="masthead">
+      <a href="#slide-one">HTMLinks / The product pitch</a
+      ><span>A three-slide presentation</span>
+    </header>
+    <main>
+      <section class="chapter slide" id="slide-one" aria-label="Slide 1">
+        <div class="copy">
+          <h1>Good work.<br />Worth sharing.</h1>
+          <p>
+            A product idea, a technical design, a whole presentation. Your agent
+            makes the HTML. HTMLinks gives it a link.
+          </p>
+          <a class="scroll-note" href="#slide-two"
+            ><span aria-hidden="true"></span>Scroll to the next slide ↓</a
+          >
+        </div>
+        <div class="stage">
+          <div class="file-orbit">
+            <div class="deck-file motion-art">
+              <span>idea.html</span><strong>Built<br />to open.</strong
+              ><small>Layout. Diagrams.<br />Interactions included.</small>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="chapter slide" id="slide-two" aria-label="Slide 2">
+        <div class="copy reveal">
+          <h2>One file.<br />One handoff.</h2>
+          <p>
+            Ask your agent to upload the HTML it just made. It returns a link
+            your readers can open, without a workspace or an account.
+          </p>
+          <p class="note">
+            Add a password when the work needs privacy. Update the content
+            without replacing the link.
+          </p>
+        </div>
+        <div class="stage">
+          <div class="conveyor motion-art">
+            <div>
+              <span
+                ><strong>“Publish this idea.”</strong
+                ><small>Your agent uploads the HTML.</small></span
+              >
+            </div>
+            <div>
+              <span
+                ><strong>A link comes back.</strong
+                ><small>Send it to someone who needs it.</small></span
+              >
+            </div>
+            <div>
+              <span
+                ><strong>The idea gets better.</strong
+                ><small>Update the file. Keep the address.</small></span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="chapter slide" id="slide-three" aria-label="Slide 3">
+        <div class="copy reveal">
+          <h2>Keep the link.<br />Choose the home.</h2>
+          <p>
+            Start with free managed hosting, or run HTMLinks on your own
+            infrastructure. The same skill supports both and remembers your
+            choice.
+          </p>
+          <p>One HTML file. A link that lasts.<br />That's the whole idea.</p>
+        </div>
+        <div class="stage">
+          <div class="hosting-split motion-art">
+            <article>
+              <svg
+                viewBox="0 0 60 60"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path
+                  d="M14 45a13 13 0 0 1 0-26 18 18 0 0 1 33 6 11 11 0 0 1-1 20Z"
+                />
+                <path d="M30 38V21m-7 7 7-7 7 7" />
+              </svg>
+              <div>
+                <h3>Managed</h3>
+                <p>Free hosting.<br />No account setup.</p>
+              </div>
+            </article>
+            <article>
+              <svg
+                viewBox="0 0 60 60"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <rect x="10" y="5" width="40" height="50" rx="4" />
+                <path
+                  d="M10 22H50M10 38H50M17 13H33M17 30H33M17 46H33M41 13H43M41 30H43M41 46H43"
+                />
+              </svg>
+              <div>
+                <h3>Self-hosted</h3>
+                <p>Docker Compose.<br />PostgreSQL. Yours.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+    <nav class="deck-nav" aria-label="Slide navigation">
+      <span id="counter" aria-live="polite">1 / 3</span>
+      <div>
+        <button id="prev" type="button" disabled aria-label="Previous slide">
+          ← Previous</button
+        ><button id="next" type="button" aria-label="Next slide">Next →</button>
+      </div>
+    </nav>
+    <script>
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+      const chapters = [...document.querySelectorAll(".chapter")];
+      let frame = 0;
+      function paint() {
+        frame = 0;
+        for (const chapter of chapters) {
+          const r = chapter.getBoundingClientRect();
+          if (r.bottom < 0 || r.top > innerHeight) continue;
+          const p = Math.max(0, Math.min(1, -r.top / Math.max(1, r.height)));
+          chapter.style.setProperty("--travel", reduced.matches ? 0 : p);
+        }
+        if (!CSS.supports("animation-timeline: scroll()")) {
+          document.querySelector(".reading-progress").style.transform =
+            "scaleX(" +
+            scrollY /
+              Math.max(1, document.documentElement.scrollHeight - innerHeight) +
+            ")";
+        }
+      }
+      function schedule() {
+        if (!frame) frame = requestAnimationFrame(paint);
+      }
+      addEventListener("scroll", schedule, { passive: true });
+      addEventListener("resize", schedule);
+      reduced.addEventListener("change", schedule);
+      paint();
+      let index = 0;
+      const slides = [...document.querySelectorAll(".slide")],
+        prev = document.getElementById("prev"),
+        next = document.getElementById("next");
+      function update(value) {
+        index = value;
+        document.getElementById("counter").textContent =
+          index + 1 + " / " + slides.length;
+        prev.disabled = index === 0;
+        next.disabled = index === slides.length - 1;
+      }
+      function go(value) {
+        const target = Math.max(0, Math.min(slides.length - 1, value));
+        slides[target].scrollIntoView({
+          behavior: reduced.matches ? "instant" : "smooth",
+          block: "start",
+        });
+      }
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) update(slides.indexOf(entry.target));
+          }
+        },
+        { threshold: 0.55 },
+      );
+      slides.forEach((slide) => observer.observe(slide));
+      prev.addEventListener("click", () => go(index - 1));
+      next.addEventListener("click", () => go(index + 1));
+      document.addEventListener("keydown", (event) => {
+        if (event.target.closest("button,a,input")) return;
+        if (event.key === "ArrowRight" || event.key === " ") {
+          event.preventDefault();
+          go(index + 1);
+        }
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          go(index - 1);
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,402 @@
+.example-scroll-scene {
+  background: var(--scene-mist);
+}
+.example-story {
+  position: relative;
+}
+@media (prefers-reduced-motion: no-preference) and (height > 740px) and (width > 1000px) {
+  .example-story {
+    height: 250svh;
+  }
+}
+.example-story[data-scroll-disabled] {
+  height: auto;
+}
+.example-story:not([data-scroll-enabled]) .example-reading-track {
+  display: none;
+}
+.example-pin {
+  min-height: 100svh;
+  padding: 48px 32px;
+  display: flex;
+  align-items: center;
+}
+[data-scroll-enabled] .example-pin {
+  position: sticky;
+  top: 0;
+}
+.example-layout {
+  width: min(1200px, 100%);
+  margin: auto;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 40px;
+  align-items: center;
+}
+.example-copy h2 {
+  font-size: clamp(36px, 3vw, 40px);
+  line-height: 1.03;
+  letter-spacing: -0.05em;
+  margin: 0 0 24px;
+}
+.example-copy p {
+  font-size: 17px;
+  line-height: 1.7;
+  margin: 0;
+}
+.example-copy .example-scroll-hint {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-top: 32px;
+  color: var(--accent);
+}
+.example-scroll-hint > span[aria-hidden] {
+  font-size: 28px;
+  line-height: 1;
+}
+.example-static-detail,
+.example-story:not([data-scroll-enabled]) .example-scroll-detail {
+  display: none;
+}
+.example-story:not([data-scroll-enabled]) .example-static-detail {
+  display: inline;
+}
+.example-copy .example-privacy-note {
+  margin-top: 25px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.example-skip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--muted);
+  text-underline-offset: 5px;
+}
+.example-frame {
+  min-width: 0;
+  perspective: 1200px;
+}
+.document-stage {
+  perspective: 1200px;
+}
+.landing-journey .example-scroll-scene .document-live iframe {
+  height: clamp(380px, 62svh, 560px);
+  pointer-events: none;
+}
+.landing-journey
+  .example-scroll-scene
+  .document-live[data-interactive="true"]
+  iframe {
+  pointer-events: auto;
+}
+.document-sheet {
+  transform-origin: 50% 70%;
+  animation: technical-sheet-in 650ms cubic-bezier(0.2, 0.75, 0.2, 1) both;
+}
+.sheet-idea {
+  animation-name: design-sheet-in;
+}
+.sheet-presentation {
+  animation-name: presentation-sheet-in;
+}
+.example-copy-change {
+  animation: example-copy-in 450ms ease-out both;
+}
+.example-scroll-scene .document-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 9px 2px;
+}
+.landing-journey .example-scroll-scene .document-caption > span {
+  display: inline;
+  font-size: 13px;
+}
+.document-interact {
+  background: none;
+  border: 0;
+  padding: 10px 0 10px 10px;
+  min-height: 44px;
+  font-size: 13px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.document-interact:hover {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+.example-reading-track {
+  height: 4px;
+  background: var(--surface-strong);
+  margin: 22px 18px 0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.example-reading-track > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left;
+  transform: scaleX(var(--example-progress, 0));
+}
+.example-noscript {
+  padding: 24px;
+}
+@keyframes technical-sheet-in {
+  from {
+    opacity: 0.4;
+    transform: translateY(35px) rotateX(9deg) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes design-sheet-in {
+  from {
+    opacity: 0.4;
+    transform: translateX(35px) rotateY(-10deg) rotateZ(2deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes presentation-sheet-in {
+  from {
+    opacity: 0.4;
+    transform: translateY(-35px) rotateX(-9deg) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes example-copy-in {
+  from {
+    opacity: 0.3;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (min-width: 701px) and (max-width: 1000px) {
+  .example-layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .example-copy-change {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 32px;
+    align-items: start;
+  }
+  .example-copy h2 {
+    font-size: 36px;
+    margin: 0;
+  }
+  .example-copy p {
+    font-size: 16px;
+  }
+  .example-copy .example-scroll-hint {
+    display: none;
+  }
+  .example-copy .example-privacy-note {
+    display: none;
+  }
+  .example-skip {
+    margin-top: 12px;
+  }
+  .example-pin {
+    padding: 40px 30px;
+  }
+}
+@media (max-width: 700px) {
+  .example-pin {
+    padding: 36px 20px;
+    min-height: auto;
+  }
+  .example-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .example-copy h2 {
+    font-size: 36px;
+    margin-bottom: 16px;
+  }
+  .example-copy p {
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 345px;
+  }
+  .example-copy .example-scroll-hint {
+    margin-top: 15px;
+    font-size: 13px;
+  }
+  .example-scroll-hint > span[aria-hidden] {
+    font-size: 23px;
+  }
+  .example-copy .example-privacy-note {
+    display: none;
+  }
+  .example-skip {
+    margin-top: 10px;
+    font-size: 13px;
+  }
+  .landing-journey .example-scroll-scene .document-live iframe {
+    height: clamp(320px, 46svh, 410px);
+  }
+  .example-scroll-scene .document-caption {
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 5px 2px;
+  }
+  .landing-journey .example-scroll-scene .document-caption > span {
+    font-size: 13px;
+  }
+  .document-interact {
+    font-size: 13px;
+    padding: 9px 0 9px 6px;
+    min-height: 44px;
+  }
+  .example-reading-track {
+    margin-top: 16px;
+  }
+}
+@media (max-height: 650px) {
+  .example-pin {
+    min-height: auto;
+  }
+  .example-copy .example-scroll-hint {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .document-sheet,
+  .example-copy-change {
+    animation: none;
+    transform: none;
+    opacity: 1;
+  }
+  .example-copy .example-scroll-hint,
+  .example-reading-track {
+    display: none;
+  }
+}
+
+.landing-journey .example-scroll-scene .document-demo {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+.landing-journey .example-scroll-scene .document-top {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 24px;
+  padding: 0 0 12px;
+}
+.landing-journey .example-scroll-scene .document-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.landing-journey .example-scroll-scene .document-tabs button {
+  position: relative;
+  padding: 12px 0;
+  border-radius: 0;
+  font-size: 14px;
+  min-height: 44px;
+  background: transparent;
+  color: var(--muted);
+  white-space: nowrap;
+  transform: none;
+}
+.landing-journey .example-scroll-scene .document-tabs button::after {
+  content: "";
+  position: absolute;
+  bottom: 1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+.landing-journey
+  .example-scroll-scene
+  .document-tabs
+  button[aria-selected="true"] {
+  color: var(--ink);
+}
+.landing-journey
+  .example-scroll-scene
+  .document-tabs
+  button[aria-selected="true"]::after {
+  transform: scaleX(1);
+}
+.landing-journey .example-scroll-scene .document-tabs button:hover {
+  color: var(--ink);
+}
+.landing-journey .example-scroll-scene .document-top > a {
+  font-size: 13px;
+  margin: 0 0 0 auto;
+  padding: 12px 0;
+}
+.landing-journey .example-scroll-scene .document-top > a > span {
+  font-size: inherit;
+}
+.landing-journey .example-scroll-scene .document-live {
+  border: 0;
+  border-radius: 0;
+}
+.landing-journey .example-scroll-scene .document-caption {
+  padding-top: 12px;
+  min-height: 56px;
+}
+.example-reading-track {
+  margin-inline: 0;
+  height: 3px;
+  border-radius: 0;
+}
+@media (max-width: 700px) {
+  .landing-journey .example-scroll-scene .document-top {
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+  .landing-journey .example-scroll-scene .document-tabs {
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .landing-journey .example-scroll-scene .document-tabs button {
+    font-size: 13px;
+    white-space: normal;
+    min-width: 44px;
+  }
+  .landing-journey .example-scroll-scene .document-top > a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .landing-journey .example-scroll-scene .document-caption > span {
+    display: none;
+  }
+  .document-interact {
+    padding-left: 0;
+  }
+}
